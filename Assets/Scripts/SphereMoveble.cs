@@ -16,8 +16,11 @@ public class SphereMoveble : MonoBehaviour
 
     public static bool isAlive;
 
-    private float xSpeed;
-    private float ySpeed;
+    [Range(0, 5f)]
+    public float range;
+
+    [Range(0, 3)]
+    public float drawRange;
 
     private void Awake()
     {
@@ -35,36 +38,30 @@ public class SphereMoveble : MonoBehaviour
     
     void FixedUpdate()
     {
-        Debug.Log($"xSpeed = {SwipeHeandler.xSpeed}");
-        Debug.Log($"ySpeed = {SwipeHeandler.ySpeed}");
         if (isAlive)
             Move();
     }
 
     void Move()
     {
-        //if (SwipeHeandler.xSpeed != 0)
-            rb.velocity = new Vector3(SwipeHeandler.xSpeed * Time.deltaTime * horizSpeed, rb.velocity.y, rb.velocity.z);
+        rb.velocity = new Vector3(0f, 0f, forwardSpeed * Time.deltaTime);
 
-        //if (SwipeHeandler.ySpeed != 0)
-        transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + Mathf.Clamp((SwipeHeandler.ySpeed * Time.deltaTime * verticalSpeed), 0f, 10f));
+        if(Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            Vector3 posToch;
 
-        rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, forwardSpeed * Time.deltaTime);
+            if (touch.phase == TouchPhase.Moved)
+            {
+                 posToch = new Vector3(
+                    transform.position.x + touch.deltaPosition.x * range,
+                    transform.position.y,
+                    transform.position.z + touch.deltaPosition.y * range);
 
-        //float horizonPos = Input.GetAxis("Horizontal");
-        //float verticalPos = Input.GetAxis("Vertical");
-
-        //if(horizonPos != 0)
-        //    rb.velocity = new Vector3(horizonPos * Time.deltaTime * horizSpeed, rb.velocity.y, rb.velocity.z);
-        ////transform.position += new Vector3(horizonPos * Time.deltaTime * horizSpeed, rb.velocity.y, rb.velocity.z); 
-
-        //if (verticalPos != 0)
-        //    transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (verticalPos * Time.deltaTime * verticalSpeed));
-
-        //    rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, forwardSpeed * Time.deltaTime);
-        ////rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y,verticalPos * Time.deltaTime * verticalSpeed);
-
-        ////rb.AddForce(Vector3.forward * forwardSpeed *Time.deltaTime, ForceMode.Acceleration);
+                transform.position = Vector3.Lerp(transform.position, posToch, 0.25f * Time.fixedDeltaTime);
+                Debug.Log($"posToch = {posToch}");
+            }
+        }      
     }
 
     private void OnCollisionEnter(Collision collision)
