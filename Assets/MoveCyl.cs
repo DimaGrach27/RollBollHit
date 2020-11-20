@@ -9,16 +9,22 @@ public class MoveCyl : MonoBehaviour
     Vector3 currentPos;
     Vector3 movePos;
 
+    bool isNotCollis;
+
     private void Start()
     {
+        isNotCollis = false;
         currentPos = new Vector3(4.1f, transform.position.y, transform.position.z); ;
         movePos = new Vector3(-4.1f, transform.position.y, transform.position.z);
 
     }
     private void Update()
     {
-        Pressed();
-        Change();
+        if (!isNotCollis)
+        {
+            Pressed();
+            Change();
+        }
     }
 
     void Pressed()
@@ -35,5 +41,11 @@ public class MoveCyl : MonoBehaviour
             isPresed = false;
         else if( transform.position.x >= 4f)
             isPresed = true;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "Object" || collision.gameObject.tag == "EnemyObject" || collision.gameObject.tag == "Player")
+            isNotCollis = true;
     }
 }
