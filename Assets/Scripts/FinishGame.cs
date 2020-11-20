@@ -7,8 +7,14 @@ public class FinishGame : MonoBehaviour
     {
         if(other.gameObject.tag == "Player")
         {
-            Invoke("ReloadScene", 1f);
+            Invoke("ReloadScene", 0.9f);
         }
+    }
+
+    private void Update()
+    {
+        if(!SphereMoveble.isAlive)
+            Invoke("ReloadScene", 2.5f);
     }
 
     void ReloadScene() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
