@@ -11,6 +11,8 @@ public class SphereMoveble : MonoBehaviour
     [SerializeField] ParticleSystem deathPart;
     ParticleSystem partPlaer;
 
+    private AudioSource audioSource;
+
     public MeshRenderer meshRend;
 
     public static bool isAlive;
@@ -20,6 +22,7 @@ public class SphereMoveble : MonoBehaviour
         meshRend = GetComponent<MeshRenderer>();
         partPlaer = GetComponent<ParticleSystem>();
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Start()
@@ -67,18 +70,33 @@ public class SphereMoveble : MonoBehaviour
             {
                 tochPos = new Vector3(touch.deltaPosition.x, 0, touch.deltaPosition.y);
             }
-            rb.AddForce(tochPos, ForceMode.VelocityChange);
+            rb.AddForce(tochPos * 27f, ForceMode.Acceleration);
         } 
     }
 #endif
     private void OnCollisionEnter(Collision collision)
     {
+        if(collision.gameObject.tag == "Object" || collision.gameObject.tag == "EnemyObject")
+        {
+            float soundVolume = 0;
+            if (Mathf.Abs(collision.relativeVelocity.x) > Mathf.Abs(collision.relativeVelocity.z))
+                soundVolume = Mathf.Abs(collision.relativeVelocity.x);
+            else
+                soundVolume = Mathf.Abs(collision.relativeVelocity.y);
+
+            audioSource.volume = Mathf.Clamp(soundVolume * 0.1f, 0.2f, 1f);
+            Debug.Log(soundVolume);
+            audioSource.Play();
+            
+        }
         if(collision.gameObject.tag == "EnemyObject" && isAlive)
             Death(); 
     }
 
     public void Death()
     {
+        audioSource.volume = 0.7f;
+        audioSource.Play();
         isAlive = false;
         Time.timeScale = 0.5f;
         rb.velocity = Vector3.zero;
@@ -86,4 +104,6 @@ public class SphereMoveble : MonoBehaviour
         deathPart.Play();
         partPlaer.Stop();
     }
+
+
 }
